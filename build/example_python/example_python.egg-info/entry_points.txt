@@ -1,0 +1,3 @@
+[console_scripts]
+helloworld_node = example_python.helloworld_node:main
+
