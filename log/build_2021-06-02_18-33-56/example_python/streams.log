@@ -1,0 +1,27 @@
+[1.522s] Invoking command in '/home/ubuntu/specialtopics/src/example_python': PYTHONPATH=/home/ubuntu/specialtopics/install/example_python/lib/python3.8/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py egg_info --egg-base ../../build/example_python build --build-base /home/ubuntu/specialtopics/build/example_python/build install --prefix /home/ubuntu/specialtopics/install/example_python --record /home/ubuntu/specialtopics/build/example_python/install.log --single-version-externally-managed
+[2.483s] /usr/local/lib/python3.8/dist-packages/setuptools/dist.py:648: UserWarning: Usage of dash-separated 'script-dir' will not be supported in future versions. Please use the underscore name 'script_dir' instead
+[2.484s]   warnings.warn(
+[2.484s] /usr/local/lib/python3.8/dist-packages/setuptools/dist.py:648: UserWarning: Usage of dash-separated 'install-scripts' will not be supported in future versions. Please use the underscore name 'install_scripts' instead
+[2.485s]   warnings.warn(
+[2.610s] running egg_info
+[2.613s] writing ../../build/example_python/example_python.egg-info/PKG-INFO
+[2.614s] writing dependency_links to ../../build/example_python/example_python.egg-info/dependency_links.txt
+[2.615s] writing entry points to ../../build/example_python/example_python.egg-info/entry_points.txt
+[2.616s] writing requirements to ../../build/example_python/example_python.egg-info/requires.txt
+[2.616s] writing top-level names to ../../build/example_python/example_python.egg-info/top_level.txt
+[2.770s] reading manifest file '../../build/example_python/example_python.egg-info/SOURCES.txt'
+[2.774s] writing manifest file '../../build/example_python/example_python.egg-info/SOURCES.txt'
+[2.774s] running build
+[2.775s] running build_py
+[2.777s] running install
+[2.780s] running install_lib
+[2.786s] running install_data
+[2.789s] running install_egg_info
+[2.795s] removing '/home/ubuntu/specialtopics/install/example_python/lib/python3.8/site-packages/example_python-0.0.0-py3.8.egg-info' (and everything under it)
+[2.797s] Copying ../../build/example_python/example_python.egg-info to /home/ubuntu/specialtopics/install/example_python/lib/python3.8/site-packages/example_python-0.0.0-py3.8.egg-info
+[2.802s] running install_scripts
+[2.875s] Installing example_helloworld_node script to /home/ubuntu/specialtopics/install/example_python/lib/example_python
+[2.875s] Installing example_listener script to /home/ubuntu/specialtopics/install/example_python/lib/example_python
+[2.876s] Installing example_talker script to /home/ubuntu/specialtopics/install/example_python/lib/example_python
+[2.877s] writing list of installed files to '/home/ubuntu/specialtopics/build/example_python/install.log'
+[2.982s] Invoked command in '/home/ubuntu/specialtopics/src/example_python' returned '0': PYTHONPATH=/home/ubuntu/specialtopics/install/example_python/lib/python3.8/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py egg_info --egg-base ../../build/example_python build --build-base /home/ubuntu/specialtopics/build/example_python/build install --prefix /home/ubuntu/specialtopics/install/example_python --record /home/ubuntu/specialtopics/build/example_python/install.log --single-version-externally-managed

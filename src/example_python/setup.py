@@ -20,7 +20,9 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'helloworld_node = example_python.helloworld_node:main'
+            'example_helloworld_node = example_python.helloworld_node:main',
+            'example_talker = example_python.publisher_member_function:main',
+            'example_listener = example_python.subscriber_member_function:main',
         ],
     },
 )

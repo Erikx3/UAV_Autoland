@@ -1,0 +1,49 @@
+[1.259s] Invoking command in '/home/ubuntu/specialtopics/src/example_python': PYTHONPATH=/home/ubuntu/specialtopics/install/example_python/lib/python3.8/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py egg_info --egg-base ../../build/example_python build --build-base /home/ubuntu/specialtopics/build/example_python/build install --prefix /home/ubuntu/specialtopics/install/example_python --record /home/ubuntu/specialtopics/build/example_python/install.log --single-version-externally-managed
+[2.229s] /usr/local/lib/python3.8/dist-packages/setuptools/dist.py:648: UserWarning: Usage of dash-separated 'script-dir' will not be supported in future versions. Please use the underscore name 'script_dir' instead
+[2.230s]   warnings.warn(
+[2.230s] /usr/local/lib/python3.8/dist-packages/setuptools/dist.py:648: UserWarning: Usage of dash-separated 'install-scripts' will not be supported in future versions. Please use the underscore name 'install_scripts' instead
+[2.230s]   warnings.warn(
+[2.357s] running egg_info
+[2.360s] writing ../../build/example_python/example_python.egg-info/PKG-INFO
+[2.361s] writing dependency_links to ../../build/example_python/example_python.egg-info/dependency_links.txt
+[2.362s] writing entry points to ../../build/example_python/example_python.egg-info/entry_points.txt
+[2.362s] writing requirements to ../../build/example_python/example_python.egg-info/requires.txt
+[2.363s] writing top-level names to ../../build/example_python/example_python.egg-info/top_level.txt
+[2.517s] reading manifest file '../../build/example_python/example_python.egg-info/SOURCES.txt'
+[2.521s] writing manifest file '../../build/example_python/example_python.egg-info/SOURCES.txt'
+[2.522s] running build
+[2.522s] running build_py
+[2.524s] running install
+[2.527s] running install_lib
+[2.534s] running install_data
+[2.536s] running install_egg_info
+[2.543s] removing '/home/ubuntu/specialtopics/install/example_python/lib/python3.8/site-packages/example_python-0.0.0-py3.8.egg-info' (and everything under it)
+[2.547s] Copying ../../build/example_python/example_python.egg-info to /home/ubuntu/specialtopics/install/example_python/lib/python3.8/site-packages/example_python-0.0.0-py3.8.egg-info
+[2.553s] running install_scripts
+[3.046s] Traceback (most recent call last):
+[3.046s]   File "setup.py", line 5, in <module>
+[3.048s]     setup(
+[3.051s]   File "/usr/local/lib/python3.8/dist-packages/setuptools/__init__.py", line 153, in setup
+[3.052s]     return distutils.core.setup(**attrs)
+[3.052s]   File "/usr/lib/python3.8/distutils/core.py", line 148, in setup
+[3.053s]     dist.run_commands()
+[3.053s]   File "/usr/lib/python3.8/distutils/dist.py", line 966, in run_commands
+[3.053s]     self.run_command(cmd)
+[3.054s]   File "/usr/lib/python3.8/distutils/dist.py", line 985, in run_command
+[3.055s]     cmd_obj.run()
+[3.056s]   File "/usr/local/lib/python3.8/dist-packages/setuptools/command/install.py", line 61, in run
+[3.057s]     return orig.install.run(self)
+[3.058s]   File "/usr/lib/python3.8/distutils/command/install.py", line 601, in run
+[3.059s]     self.run_command(cmd_name)
+[3.060s]   File "/usr/lib/python3.8/distutils/cmd.py", line 313, in run_command
+[3.061s]     self.distribution.run_command(command)
+[3.062s]   File "/usr/lib/python3.8/distutils/dist.py", line 985, in run_command
+[3.063s]     cmd_obj.run()
+[3.064s]   File "/usr/local/lib/python3.8/dist-packages/setuptools/command/install_scripts.py", line 52, in run
+[3.065s]     for args in writer.get_args(dist, cmd.as_header()):
+[3.066s]   File "/usr/local/lib/python3.8/dist-packages/setuptools/command/easy_install.py", line 2111, in get_args
+[3.067s]     cls._ensure_safe_name(name)
+[3.068s]   File "/usr/local/lib/python3.8/dist-packages/setuptools/command/easy_install.py", line 2124, in _ensure_safe_name
+[3.069s]     raise ValueError("Path separators not allowed in script names")
+[3.070s] ValueError: Path separators not allowed in script names
+[3.209s] Invoked command in '/home/ubuntu/specialtopics/src/example_python' returned '1': PYTHONPATH=/home/ubuntu/specialtopics/install/example_python/lib/python3.8/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py egg_info --egg-base ../../build/example_python build --build-base /home/ubuntu/specialtopics/build/example_python/build install --prefix /home/ubuntu/specialtopics/install/example_python --record /home/ubuntu/specialtopics/build/example_python/install.log --single-version-externally-managed

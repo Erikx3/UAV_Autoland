@@ -10,6 +10,8 @@ setup.py
 ../../build/example_python/example_python.egg-info/zip-safe
 example_python/__init__.py
 example_python/helloworld_node.py
+example_python/publisher_member_function.py
+example_python/subscriber_member_function.py
 resource/example_python
 test/test_copyright.py
 test/test_flake8.py
