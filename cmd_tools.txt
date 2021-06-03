@@ -1,0 +1,13 @@
+cmd tools:
+
+# Retrieve IP
+$ hostname -I
+
+# Connect to RasPy
+$ ssh ubuntu@192.168.178.26
+
+# Build added/ edited package
+$ colcon build --packages-select my_package_name
+
+# Start launch file
+$ ros2 launch example_python example.launch.py
