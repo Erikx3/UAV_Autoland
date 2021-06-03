@@ -18,10 +18,10 @@ from rclpy.node import Node
 from std_msgs.msg import String
 
 
-class MinimalSubscriber(Node):
+class MinimalSubPub(Node):
 
     def __init__(self):
-        super().__init__('minimal_subscriber')
+        super().__init__('minimal_subpub')
         self.subscription = self.create_subscription(
             String,
             'topic',
@@ -50,7 +50,7 @@ class MinimalSubscriber(Node):
 def main(args=None):
     rclpy.init(args=args)
 
-    minimal_subscriber = MinimalSubscriber()
+    minimal_subscriber = MinimalSubPub()
 
     rclpy.spin(minimal_subscriber)
 
