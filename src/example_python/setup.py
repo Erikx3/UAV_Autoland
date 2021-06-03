@@ -1,4 +1,6 @@
 from setuptools import setup
+import os
+import glob
 
 package_name = 'example_python'
 
