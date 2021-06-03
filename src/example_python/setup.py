@@ -1,6 +1,6 @@
-from setuptools import setup
 import os
-import glob
+from glob import glob
+from setuptools import setup
 
 package_name = 'example_python'
 
