@@ -16,3 +16,7 @@ $ ros2 launch example_python example.launch.py
 
 $ sudo raspistill -o Desktop/image.jpg
 
+
+# To run rosbag2, navigate into the rosbag2 folder and then run
+
+$ ros2 bag recors <topic_name>
