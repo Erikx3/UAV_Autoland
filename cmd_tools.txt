@@ -11,3 +11,8 @@ $ colcon build --packages-select my_package_name
 
 # Start launch file
 $ ros2 launch example_python example.launch.py
+
+# Taking image with the RasPi Cam :)
+
+$ sudo raspistill -o Desktop/image.jpg
+
