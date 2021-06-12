@@ -17,6 +17,7 @@ from rclpy.node import Node
 
 from sensor_msgs.msg import Image, CameraInfo
 from std_msgs.msg import String
+from geometry_msgs.msg import Transform, Vector3, Quaternion
 
 import message_filters
 import cv2
@@ -40,7 +41,7 @@ class ImageVectors(Node):
         self.rgb_image_data = []
         
         # Create publisher
-        self.publisher_ = self.create_publisher(String, 'image_vectors', 10)
+        self.publisher_ = self.create_publisher(Transform, 'image_vectors', 10)
         timer_period = 1.0  # seconds
         self.timer = self.create_timer(timer_period, self.image_vectors_callback)
 
@@ -49,10 +50,24 @@ class ImageVectors(Node):
         self.get_logger().info('I received the image')
 
     def image_vectors_callback(self):
-        msg = String()
-        msg.data = "Here will be rvec and tvec"
-        self.publisher_.publish(msg)
-        self.get_logger().info(msg.data)
+        #msg = String()
+        #msg.data = "Here will be rvec and tvec"
+        
+        T = Transform()
+        V = Vector3()
+        Q = Quaternion()
+        V.x = 1.1
+        V.y = 2.2
+        V.z = 3.3
+        Q.x = 0.1
+        Q.y = 0.2
+        Q.z = 0.3
+        Q.w = 0.4
+        T.translation = V
+        T.rotation = Q
+                
+        self.publisher_.publish(T)
+        self.get_logger().info(str(T))
 
 
 def main(args=None):
