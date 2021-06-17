@@ -20,6 +20,7 @@ from std_msgs.msg import String
 from geometry_msgs.msg import Transform, Vector3, Quaternion
 
 import message_filters
+import numpy as np
 import cv2
 from cv_bridge import CvBridge
 
@@ -60,10 +61,10 @@ class ImageVectors(Node):
 
 	
     def camera_info_lis_callback(self, msg):
-        self.camera_distortion = msg.d
-        self.camera_distortion = msg.k
+        self.camera_distortion = np.array(msg.d)
+        self.camera_matrix = np.array(msg.k).reshape([3, 3])
         
-        self.get_logger().info('I received the camera info')
+        self.get_logger().info('I received the camera info {} \n {}'.format(str(self.camera_distortion), str(self.camera_matrix)))
         
     def image_lis_callback(self, msg):
         self.rgb_image_data = msg.data
