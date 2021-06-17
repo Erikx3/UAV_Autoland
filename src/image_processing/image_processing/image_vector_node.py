@@ -37,17 +37,37 @@ class ImageVectors(Node):
             1)
         self.image_sub  # prevent unused variable warning
         
-        # Variable for saving
-        self.rgb_image_data = []
+        # Listening to camera info (should be static, for calibration parameters)
+        self.camera_info_sub = self.create_subscription(
+            CameraInfo,
+            'camera_info',
+            self.camera_info_lis_callback,
+            1)
+        self.camera_info_sub  # prevent unused variable warning
+        
+        # Variable for saving active image data and camera info
+        self.rgb_image_data = None
+        self.camera_distortion = None
+        self.camera_matrix = None
+        
         
         # Create publisher
         self.publisher_ = self.create_publisher(Transform, 'image_vectors', 10)
+        
+        # TODO: Kick this out and publish on image_lis callback?
         timer_period = 1.0  # seconds
         self.timer = self.create_timer(timer_period, self.image_vectors_callback)
 
+	
+    def camera_info_lis_callback(self, msg):
+        self.camera_distortion = msg.d
+        self.camera_distortion = msg.k
+        
+        self.get_logger().info('I received the camera info')
+        
     def image_lis_callback(self, msg):
         self.rgb_image_data = msg.data
-        self.get_logger().info('I received the image')
+        self.get_logger().info('I received the image from time {}'.format(str(msg.header.stamp)))
 
     def image_vectors_callback(self):
         #msg = String()
