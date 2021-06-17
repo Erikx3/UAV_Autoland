@@ -1,3 +1,0 @@
-[console_scripts]
-image_vector_node = image_processing.image_vector_node:main
-

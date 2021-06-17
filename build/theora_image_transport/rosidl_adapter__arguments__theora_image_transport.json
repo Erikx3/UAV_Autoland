@@ -1,6 +1,0 @@
-{
-  "package_name": "theora_image_transport",
-  "non_idl_tuples": [
-    "/home/ubuntu/specialtopics/src/image_transport_plugins/theora_image_transport:msg/Packet.msg"
-  ]
-}
