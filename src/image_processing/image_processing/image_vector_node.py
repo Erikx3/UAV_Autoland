@@ -54,12 +54,7 @@ class ImageVectors(Node):
         
         # Create publisher
         self.publisher_ = self.create_publisher(Transform, 'image_vectors', 10)
-        
-        # TODO: Kick this out and publish on image_lis callback?
-        timer_period = 1.0  # seconds
-        self.timer = self.create_timer(timer_period, self.image_vectors_callback)
-
-	
+        	
     def camera_info_lis_callback(self, msg):
         self.camera_distortion = np.array(msg.d)
         self.camera_matrix = np.array(msg.k).reshape([3, 3])
@@ -69,10 +64,6 @@ class ImageVectors(Node):
     def image_lis_callback(self, msg):
         self.rgb_image_data = msg.data
         self.get_logger().info('I received the image from time {}'.format(str(msg.header.stamp)))
-
-    def image_vectors_callback(self):
-        #msg = String()
-        #msg.data = "Here will be rvec and tvec"
         
         T = Transform()
         V = Vector3()
@@ -88,7 +79,7 @@ class ImageVectors(Node):
         T.rotation = Q
                 
         self.publisher_.publish(T)
-        self.get_logger().info(str(T))
+        self.get_logger().info('I publish: ' + str(T))
 
 
 def main(args=None):
