@@ -24,4 +24,5 @@ $ ros2 bag recors <topic_name>
 # To see topics running, --no-daemon command needed, since buggy otherwise(?)
 
 $ ros2 topic list --no-daemon
+$ ros2 param list
 
