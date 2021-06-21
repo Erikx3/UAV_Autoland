@@ -22,8 +22,8 @@ from geometry_msgs.msg import Transform, Vector3, Quaternion
 import message_filters
 import numpy as np
 import cv2
+from cv2 import aruco
 from cv_bridge import CvBridge
-
 
 
 class ImageVectors(Node):
@@ -48,9 +48,16 @@ class ImageVectors(Node):
         
         # Variable for saving active image data and camera info
         self.rgb_image_data = None
+        self.rgb_image_cv = None
         self.camera_distortion = None
         self.camera_matrix = None
+        self.trans_vec = None
+        self.rot_vec = None
+        self.quat_vec = None
         
+        # Init for Aruco markers
+        self.aruco_dict = aruco.Dictionary_get(aruco.DICT_6X6_250)
+        self.aruco_parameters = aruco.DetectorParameters_create()  # Initialize Parameters
         
         # Create publisher
         self.publisher_ = self.create_publisher(Transform, 'image_vectors', 10)
@@ -59,11 +66,26 @@ class ImageVectors(Node):
         self.camera_distortion = np.array(msg.d)
         self.camera_matrix = np.array(msg.k).reshape([3, 3])
         
-        self.get_logger().info('I received the camera info {} \n {}'.format(str(self.camera_distortion), str(self.camera_matrix)))
+        #self.get_logger().info('I received the camera info {} \n {}'.format(str(self.camera_distortion), str(self.camera_matrix)))
         
     def image_lis_callback(self, msg):
-        self.rgb_image_data = msg.data
-        self.get_logger().info('I received the image from time {}'.format(str(msg.header.stamp)))
+        #self.rgb_image_data = msg.data
+        
+        self.rgb_image_cv = CvBridge().imgmsg_to_cv2(msg, desired_encoding="rgb8")
+        gray = cv2.cvtColor(self.rgb_image_cv, cv2.COLOR_BGR2GRAY)
+        
+        
+        #self.get_logger().info(str([str(gray), str(self.aruco_dict) , self.aruco_parameters]))  
+        #self.get_logger().info('I received the image: {}'.format(str(self.rgb_image_cv)))
+        
+        
+        corners, ids, rej = aruco.detectMarkers(gray, self.aruco_dict, parameters=self.aruco_parameters)
+        if ids is not None:
+        	self.get_logger().info("I found {} aruco markers!".format(len(ids)))       		
+        
+        
+        #self.get_logger().info('I received the image from time {}'.format(str(msg.header.stamp)))
+        
         
         T = Transform()
         V = Vector3()
@@ -79,7 +101,7 @@ class ImageVectors(Node):
         T.rotation = Q
                 
         self.publisher_.publish(T)
-        self.get_logger().info('I publish: ' + str(T))
+        #self.get_logger().info('I publish: ' + str(T))
 
 
 def main(args=None):
