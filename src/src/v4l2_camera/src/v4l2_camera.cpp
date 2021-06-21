@@ -206,7 +206,7 @@ void V4L2Camera::createParameters()
   }
 
   image_size_descriptor.additional_constraints = image_sizes_constraints.str();
-  image_size = declare_parameter<ImageSize>("image_size", {640, 480}, image_size_descriptor);
+  image_size = declare_parameter<ImageSize>("image_size", {1080, 1080}, image_size_descriptor);
   requestImageSize(image_size);
 
   // Control parameters

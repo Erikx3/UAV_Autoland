@@ -16,10 +16,8 @@ import rclpy
 from rclpy.node import Node
 
 from sensor_msgs.msg import Image, CameraInfo
-from std_msgs.msg import String
 from geometry_msgs.msg import Transform, Vector3, Quaternion
 
-import message_filters
 import numpy as np
 import cv2
 from cv2 import aruco
@@ -95,6 +93,7 @@ class ImageVectors(Node):
             self.get_logger().info("I found {} aruco markers!".format(len(ids)))
             for i, idt in enumerate(ids.flatten()):
                 marker_length = self.marker_length_dict[str(idt)]
+                # Check if matrix parameters are available
                 if self.camera_matrix is not None and self.camera_distortion is not None:
                     rvec, tvec, markerPoints = cv2.aruco.estimatePoseSingleMarkers(corners=corners[i],
                                                                                    markerLength=marker_length,
@@ -106,28 +105,31 @@ class ImageVectors(Node):
                     # Always choose the one in the middle, else just pick one by random (or here last one)
                     if idt == 5:
                         break
-
+	
+        #check if available and if z transformation is positive (sometime local coordinate systems are flipped) 
         if tvec is not None and rvec is not None:
-            # Calculate into quaternion
-            r = Rotation.from_rotvec(rvec)
-            quat = r.as_quat()  # These are automatically normalized
+        	
+        	if tvec[2]>0:
+		        # Calculate quaternion from rotation vector
+		        r = Rotation.from_rotvec(rvec)
+		        quat = r.as_quat()  # These are automatically normalized
 
-            # Build ros geometry transform Message Output and publish it
-            T = Transform()
-            V = Vector3()
-            Q = Quaternion()
-            V.x = tvec[0]
-            V.y = tvec[1]
-            V.z = tvec[2]
-            Q.x = quat[0]
-            Q.y = quat[1]
-            Q.z = quat[2]
-            Q.w = quat[3]
-            T.translation = V
-            T.rotation = Q
+		        # Build ros geometry transform Message Output and publish it
+		        T = Transform()
+		        V = Vector3()
+		        Q = Quaternion()
+		        V.x = tvec[0]
+		        V.y = tvec[1]
+		        V.z = tvec[2]
+		        Q.x = quat[0]
+		        Q.y = quat[1]
+		        Q.z = quat[2]
+		        Q.w = quat[3]
+		        T.translation = V
+		        T.rotation = Q
 
-            self.publisher_.publish(T)
-            self.get_logger().info('I publish: ' + str(T))
+		        self.publisher_.publish(T)
+		        self.get_logger().info('I publish: ' + str(T))
 
 
 def main(args=None):

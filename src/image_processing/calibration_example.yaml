@@ -1,5 +1,5 @@
-image_width: 1024
-image_height: 760
+image_width: 1080
+image_height: 1080
 camera_name: narrow_stereo
 camera_matrix:
   rows: 3

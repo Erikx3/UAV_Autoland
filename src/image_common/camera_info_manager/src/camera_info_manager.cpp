@@ -66,7 +66,7 @@ using camera_calibration_parsers::writeCalibration;
 
 /** URL to use when no other is defined. */
 const std::string
-  default_camera_info_url = "file://${ROS_HOME}/camera_info/${NAME}.yaml";
+  default_camera_info_url = "file:///home/ubuntu/specialtopics/src/image_processing/calibration_example.yaml";
 
 /** Constructor
  *
