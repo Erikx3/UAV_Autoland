@@ -24,10 +24,10 @@ import numpy as np
 import cv2
 from cv2 import aruco
 from cv_bridge import CvBridge
+from scipy.spatial.transform import Rotation
 
 
 class ImageVectors(Node):
-
     def __init__(self):
         super().__init__('image_vector_node')
         # Listening to image topic
@@ -108,16 +108,21 @@ class ImageVectors(Node):
                         break
 
         if tvec is not None and rvec is not None:
+            # Calculate into quaternion
+            r = Rotation.from_rotvec(rvec)
+            quat = r.as_quat()  # These are automatically normalized
+
+            # Build ros geometry transform Message Output and publish it
             T = Transform()
             V = Vector3()
             Q = Quaternion()
-            V.x = 1.1
-            V.y = 2.2
-            V.z = 3.3
-            Q.x = 0.1
-            Q.y = 0.2
-            Q.z = 0.3
-            Q.w = 0.4
+            V.x = tvec[0]
+            V.y = tvec[1]
+            V.z = tvec[2]
+            Q.x = quat[0]
+            Q.y = quat[1]
+            Q.z = quat[2]
+            Q.w = quat[3]
             T.translation = V
             T.rotation = Q
 
