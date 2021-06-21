@@ -1,3 +1,5 @@
-log/
+log/*
 .idea/
-
+build/*
+install/*
+rosbag2_files
