@@ -87,7 +87,9 @@ class ImageVectors(Node):
 
         # self.get_logger().info(str([str(gray), str(self.aruco_dict) , self.aruco_parameters]))
         # self.get_logger().info('I received the image: {}'.format(str(self.rgb_image_cv)))
-
+        # self.get_logger().info('I received the image from time {}'.format(str(msg.header.stamp)))
+        rvec = None
+        tvec = None
         corners, ids, rej = aruco.detectMarkers(gray, self.aruco_dict, parameters=self.aruco_parameters)
         if ids is not None:
             self.get_logger().info("I found {} aruco markers!".format(len(ids)))
@@ -99,24 +101,28 @@ class ImageVectors(Node):
                                                                                    cameraMatrix=self.camera_matrix,
                                                                                    distCoeffs=self.camera_distortion
                                                                                    )
+                    rvec = rvec.flatten()
+                    tvec = tvec.flatten()
+                    # Always choose the one in the middle, else just pick one by random (or here last one)
+                    if idt == 5:
+                        break
 
-        # self.get_logger().info('I received the image from time {}'.format(str(msg.header.stamp)))
+        if tvec is not None and rvec is not None:
+            T = Transform()
+            V = Vector3()
+            Q = Quaternion()
+            V.x = 1.1
+            V.y = 2.2
+            V.z = 3.3
+            Q.x = 0.1
+            Q.y = 0.2
+            Q.z = 0.3
+            Q.w = 0.4
+            T.translation = V
+            T.rotation = Q
 
-        T = Transform()
-        V = Vector3()
-        Q = Quaternion()
-        V.x = 1.1
-        V.y = 2.2
-        V.z = 3.3
-        Q.x = 0.1
-        Q.y = 0.2
-        Q.z = 0.3
-        Q.w = 0.4
-        T.translation = V
-        T.rotation = Q
-
-        self.publisher_.publish(T)
-        # self.get_logger().info('I publish: ' + str(T))
+            self.publisher_.publish(T)
+            self.get_logger().info('I publish: ' + str(T))
 
 
 def main(args=None):
