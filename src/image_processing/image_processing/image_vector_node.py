@@ -56,11 +56,18 @@ class ImageVectors(Node):
         # Init for Aruco markers
         self.aruco_dict = aruco.Dictionary_get(aruco.DICT_6X6_250)
         self.aruco_parameters = aruco.DetectorParameters_create()  # Initialize Parameters
-        self.marker_length_dict = {"1": 0.063,
-                                   "3": 0.063,
-                                   "5": 0.031,
-                                   "7": 0.063,
-                                   "9": 0.063}  # Dictionary for all 5 marker lengths
+        # self.marker_length_dict = {"1": 0.063,
+        #                            "3": 0.063,
+        #                            "5": 0.031,
+        #                            "7": 0.063,
+        #                            "9": 0.063}  # Dictionary for all 5 marker lengths for DINA4
+
+        self.marker_length_dict = {"1": 0.1635,
+                                   "3": 0.1635,
+                                   "4": 0.1635,
+                                   "5": 0.082,
+                                   "7": 0.408,
+                                   "9": 0.1635}  # Dictionary for all 5 marker lengths for DINA2
 
         # Create publisher
         self.publisher_ = self.create_publisher(Transform, 'image_vectors', 10)
