@@ -15,8 +15,10 @@
 import rclpy
 from rclpy.node import Node
 
+from std_msgs import Header
 from sensor_msgs.msg import Image, CameraInfo
-from geometry_msgs.msg import Transform, Vector3, Quaternion
+from geometry_msgs.msg import Transform, TransformStamped, Vector3, Quaternion
+from tf2_msgs.msg import TFMessage
 
 import numpy as np
 import cv2
@@ -69,8 +71,12 @@ class ImageVectors(Node):
                                    "7": 0.408,
                                    "9": 0.1635}  # Dictionary for all 5 marker lengths for DINA2
 
-        # Create publisher
+        # Create publisher for raw transfrom
         self.publisher_ = self.create_publisher(Transform, 'image_vectors', 10)
+
+        # Create publisher for tf2 
+        self.publisher_tf2 = self.create_publisher(TFMessage, "/tf")
+        self.tf2_frame_id = 1
 
         # Some flags for logging
         self.camera_info_lis_callback_flag = True
@@ -137,6 +143,23 @@ class ImageVectors(Node):
 
 		        self.publisher_.publish(T)
 		        self.get_logger().info('I publish: ' + str(T))
+
+                # Publish tf2 topic
+                TF2 = TFMessage()
+                Tstamped = TransformStamped()
+                Theader = Header()
+
+                Theader.seq = self.tf2_frame_id
+                self.tf2_frame_id = self.tf2_frame_id + 1
+                Theader.stamp = node.get_clock().now().to_msg()
+                Theader.frame_id = "camera"
+
+                Tstamped.transform = T
+                Tstamped.child_frame_id = "aruco_marker"
+                Tstamped.header = Theader
+
+                TF2.transforms = [Tstamped]
+                self.publisher_tf2.publish(TF2)
 
 
 def main(args=None):
