@@ -25,6 +25,7 @@ setup(
     entry_points={
         'console_scripts': [
             'image_vector_node = image_processing.image_vector_node:main',
+            'orientation_publisher = image_processing.orientation_publisher:main',
         ],
     },
 )
