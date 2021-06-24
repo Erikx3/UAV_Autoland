@@ -15,7 +15,7 @@
 import rclpy
 from rclpy.node import Node
 
-from std_msgs import Header
+from std_msgs.msg import Header
 from sensor_msgs.msg import Image, CameraInfo
 from geometry_msgs.msg import Transform, TransformStamped, Vector3, Quaternion
 from tf2_msgs.msg import TFMessage
@@ -75,8 +75,7 @@ class ImageVectors(Node):
         self.publisher_ = self.create_publisher(Transform, 'image_vectors', 10)
 
         # Create publisher for tf2 
-        self.publisher_tf2 = self.create_publisher(TFMessage, "/tf")
-        self.tf2_frame_id = 1
+        self.publisher_tf2 = self.create_publisher(TFMessage, "/tf", 1)
 
         # Some flags for logging
         self.camera_info_lis_callback_flag = True
@@ -149,9 +148,7 @@ class ImageVectors(Node):
 		        Tstamped = TransformStamped()
 		        Theader = Header()
 
-		        Theader.seq = self.tf2_frame_id
-		        self.tf2_frame_id = self.tf2_frame_id + 1
-		        Theader.stamp = node.get_clock().now().to_msg()
+		        Theader.stamp = self.get_clock().now().to_msg()
 		        Theader.frame_id = "camera"
 
 		        Tstamped.transform = T
