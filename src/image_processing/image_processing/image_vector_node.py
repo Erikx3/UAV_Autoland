@@ -66,10 +66,10 @@ class ImageVectors(Node):
 
         self.marker_length_dict = {"1": 0.1635,
                                    "3": 0.1635,
-                                   "4": 0.1635,
+                                   "4": 0.1695,
                                    "5": 0.082,
                                    "7": 0.408,
-                                   "9": 0.1635}  # Dictionary for all 5 marker lengths for DINA2
+                                   "9": 0.1635}  # Dictionary for all 6 marker lengths for both DINA2
 
         # Create publisher for raw transfrom
         self.publisher_ = self.create_publisher(Transform, 'image_vectors', 10)
