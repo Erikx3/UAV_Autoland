@@ -8,6 +8,13 @@ from px4_msgs.msg import Timesync, OffboardControlMode, TrajectorySetpoint, Vehi
 
 class VelocityCommander(Node):
 
+    # parameters
+    TOPIC_CMD_VEL   = 'cmd_vel'
+    TOPIC_PX4_TIME  = 'Timesync_PubSubTopic'
+    TOPIC_TRAJ_WP   = '/TrajectorySetpoint_PubSubTopic'
+    TOPIC_OFFB_CTRL_MODE = '/OffboardControlMode_PubSubTopic'
+    TOPIC_VEH_CMD   = '/VehicleCommand_PubSubTopic'
+
     def __init__(self):
         super().__init__('velocity_commander')
 
@@ -21,33 +28,29 @@ class VelocityCommander(Node):
         # subscription callbacks
         self.sub_timesync = self.create_subscription(
             Timesync,
-            'Timesync_PubSubTopic',
+            self.TOPIC_PX4_TIME,
             self.process_timesync_callback,
             1)
         self.sub_vel = self.create_subscription(
             Twist,
-            'cmd_vel',
+            self.TOPIC_CMD_VEL,
             self.process_vel_callback,
             1)
 
 
         # init publications
-        self.offb_control_mode_publisher = self.create_publisher(OffboardControlMode, "/OffboardControlMode_PubSubTopic", 10)
-        self.traj_sp_publisher = self.create_publisher(TrajectorySetpoint, "/TrajectorySetpoint_PubSubTopic", 10)
-        self.veh_cmd_publisher = self.create_publisher(VehicleCommand, "/VehicleCommand_PubSubTopic", 10)
+        self.offb_control_mode_publisher = self.create_publisher(OffboardControlMode, self.TOPIC_OFFB_CTRL_MODE, 10)
+        self.traj_sp_publisher = self.create_publisher(TrajectorySetpoint, self.TOPIC_TRAJ_WP, 10)
+        self.veh_cmd_publisher = self.create_publisher(VehicleCommand, self.TOPIC_VEH_CMD, 10)
 
         self.pub_vel_timer = self.create_timer(.1, self.timer_callback)
-
-        self.pub_offb_control_mode()
 
     def timer_callback(self):
         # change to offboard mode after 10 loops
         if self.pub_counter == 10:
+            # set offboard mode
             self.pub_vehicle_command(VehicleCommand.VEHICLE_CMD_DO_SET_MODE, 1., 6.)
             self.arm()
-
-            print("Arming")
-            print(VehicleCommand.VEHICLE_CMD_DO_SET_MODE)
 
         self.pub_offb_control_mode()
         self.pub_trajectory_setpoint()
@@ -99,6 +102,7 @@ class VelocityCommander(Node):
 
     def arm(self):
         self.pub_vehicle_command(VehicleCommand.VEHICLE_CMD_COMPONENT_ARM_DISARM, 1., 0.)
+        self.get_logger().info('Arm vehicle')
         
 
     def pub_vehicle_command(self, command, param1, param2):
