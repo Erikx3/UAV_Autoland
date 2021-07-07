@@ -91,6 +91,8 @@ class VelocityCommander(Node):
         sp.y = math.nan
         sp.z = -3.
 
+        sp.yaw = math.nan # should not yaw right at startup
+
         sp.vx = self.vel.x
         sp.vy = self.vel.y
         sp.vz = self.vel.z
