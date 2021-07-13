@@ -7,7 +7,7 @@ def generate_launch_description():
     return launch.LaunchDescription([
         # RTPS connection with raspberry pi
         launch.actions.ExecuteProcess(
-        	cmd=['micrortps_agent', 'start', '-t', 'UART', '-d', 'ttyUSB0'],
+        	cmd=['micrortps_agent', 'start', '-t', 'UART', '-d', '/dev/ttyUSB0'],
         	output='screen'
         	),
 
