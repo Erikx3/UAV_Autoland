@@ -24,7 +24,9 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'velocity_commander = landing_controller.velocity_commander:main'
+            'velocity_commander = landing_controller.velocity_commander:main',
+            'velocity_controller = landing_controller.velocity_controller:main',
+            'test_pub_aruco= landing_controller.test_pub_aruco:main'
         ],
     },
 )

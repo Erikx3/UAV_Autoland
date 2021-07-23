@@ -23,8 +23,6 @@ class VelocityCommander(Node):
         super().__init__('velocity_commander')
 
         # class variables
-        self.keep_alive = True
-        self.key = -1
         self.t_sync = 0
         self.vel = Vector3()
         self.pub_counter = 0
