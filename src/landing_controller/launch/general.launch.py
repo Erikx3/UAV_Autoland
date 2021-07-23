@@ -16,6 +16,9 @@ def generate_launch_description():
     launch_cmd = ['ros2', 'bag', 'record']
     for topic in VelocityCommander.TOPICS:
         launch_cmd.append(VelocityCommander.TOPICS[topic])
+    # Image Topics
+    launch_cmd.append('/image_raw')  # Image topic from camera
+    launch_cmd.append('/image_vectors')  # Image Vector for transformation
 
 
     return launch.LaunchDescription([

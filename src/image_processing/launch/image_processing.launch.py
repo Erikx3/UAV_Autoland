@@ -17,9 +17,9 @@ def generate_launch_description():
             namespace='',
             executable='v4l2_camera_node',
             output='screen',
-            name=['camera_node']),
-        launch.actions.ExecuteProcess(
-        	cmd=['ros2', 'bag', 'record', '/image_raw', '/image_vectors'],
-        	output='screen'
-        	)
+            name=['camera_node'])
+        # launch.actions.ExecuteProcess(
+        # 	cmd=['ros2', 'bag', 'record', '/image_raw', '/image_vectors'],
+        # 	output='screen'
+        # 	)
     ])
