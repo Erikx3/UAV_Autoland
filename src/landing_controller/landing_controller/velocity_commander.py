@@ -54,7 +54,7 @@ class VelocityCommander(Node):
         if self.pub_counter == 10:
             # set offboard mode
             self.pub_vehicle_command(VehicleCommand.VEHICLE_CMD_DO_SET_MODE, 1., 6.)
-            self.arm()
+            #self.arm()
 
         self.pub_offb_control_mode()
         self.pub_trajectory_setpoint()
@@ -89,7 +89,7 @@ class VelocityCommander(Node):
 
         sp.x = math.nan
         sp.y = math.nan
-        sp.z = -3.
+        sp.z = -1.5
 
         sp.yaw = math.nan # should not yaw right at startup
 
