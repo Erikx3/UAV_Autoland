@@ -1,16 +1,23 @@
 import rclpy
 from rclpy.duration import Duration
+from rclpy.time import Time
 from rclpy.node import Node
+
+from time import sleep
 
 import math
 
 from std_msgs.msg import Header, Float32
-from geometry_msgs.msg import TransformStamped, Twist, Vector3, Transform
-from tf2_msgs.msg import TFMessage
-from tf2_ros import BufferInterface
+from geometry_msgs.msg import TransformStamped, Twist, Vector3, Transform, Quaternion
+
+from px4_msgs.msg import VehicleAttitude
+
+from tf2_ros import Buffer
+from tf2_ros.transform_listener import TransformListener
+from tf2_ros.transform_broadcaster import TransformBroadcaster
 
 from landing_controller.velocity_commander import VelocityCommander
-from tf2_ros.transform_listener import TransformListener
+from landing_controller.vector_math import *
 
 
 class VelocityController(Node):
@@ -22,8 +29,7 @@ class VelocityController(Node):
     TOPICS["CMD_VEL"] = VelocityCommander.TOPICS["CMD_VEL"]
 
     FRAMES = {
-        "ARUCO"   : "aruco_marker",
-        "NED"           : "ned"
+        "ARUCO"   : "aruco_marker"
     }
 
     # time in seconds in which the timeout function is called
@@ -37,15 +43,31 @@ class VelocityController(Node):
 
         # class variables
         self.aruco_timeout_reset = True
-        self.tf_buf = BufferInterface()
-        self.gains = {"P", 0.} # Initial controller gains
+        self.gains = {"P": 0.} # Initial controller gains
+
+        # set up transform listener
+        self.tf_buf = Buffer()
+        self.tf_listener  = TransformListener(self.tf_buf, self, spin_thread=False)
+
+        # /map frame (https://www.ros.org/reps/rep-0103.html#axis-orientation) 
+        # to North-East-Down frame
+        self.init_static_frame('map', 'ned', Vector3(),
+                Quaternion(x=1., w=0.)) # Rotation of 180 degrees around x-axis
+
+        # pixhawk to camera -> dependent on drone construction
+        self.init_static_frame('pixhawk', 'camera', 
+                Vector3(z=.1),      # Translation from Pixhawk to Camera
+                Quaternion())       # Rotation from Pixhawk to Camera
+
+        # set up transform broadcaster (for debug)
+        self.tf_broadcaster = TransformBroadcaster(self)
 
         # subscription callbacks
-        self.sub_tf = self.create_subscription(
-            TFMessage,
-            "/tf",
-            self.process_tf_callback,
-            1)
+        self.sub_att = self.create_subscription(
+            VehicleAttitude,
+            'VehicleAttitude_PubSubTopic',
+            self.attitude_callback,
+            10)
         self.sub_ctrl_gain = self.create_subscription(
             Float32,
             self.TOPICS["P_GAIN"],
@@ -56,42 +78,54 @@ class VelocityController(Node):
         self.vel_publisher = self.create_publisher(Twist, self.TOPICS["CMD_VEL"], 1)
             
         # timer callbacks
-        self.aruco_timout_timer = self.create_timer(self.ARUCO_TIMEOUT, self.aruco_timer_callback)
-
-        # transform listeners
-        #self.tf_listener = TransformListener(self.tf_buf, self, spin_thread=True)
+        self.control_timer = self.create_timer(.1, self.control)
 
 
-    def process_tf_callback(self, msg: Twist):
-        """Applies control algorithm when new aruco frame was received
 
-        :param Twist msg: received Twist message
-        """
-        print("Callback TF")
-        for transformStamped in msg.transforms:
-            print('Got child frame ' + transformStamped.child_frame_id)
-            if transformStamped.child_frame_id == self.FRAMES["ARUCO"]:
-                self.aruco_timeout_reset = False
+    def attitude_callback(self, msg: VehicleAttitude):
+        # rotation in msg is rotation from FRONT-RIGHT-DOWN (FRD) to
+        # NORTH-EAST-DOWN (NED)
+        # (see https://github.com/PX4/PX4-Autopilot/blob/master/msg/vehicle_attitude.msg)
 
-                tf = self.tf_buf.lookup_transform(self.FRAMES["NED"], self.FRAMES["ARUCO"], 0)
-                print(tf)
+        tf = Transform(rotation=numpy_ndarray_to_Quaternion(msg.q))
+        tf_header = Header(stamp=self.get_clock().now().to_msg(), frame_id='ned')
+        tf_stamped = TransformStamped(transform=tf, header=tf_header, child_frame_id='pixhawk')
 
-                #e = -self.tf_buf.transform(Vector3(), self.FRAMES["NED"], Duration(seconds=.1))
-                #self.control(e)
+        self.tf_buf.set_transform(tf_stamped, 'default_authority')
 
-                return
+        self.publish_debug_frames()
+
+    def process_p_gain_callback(self, msg: Float32):
+        self.gains["P"] = msg.data
 
 
-    def control(self, e: Vector3):
+    def init_static_frame(self, source: str, target: str, trans: Vector3, rot: Quaternion):
+        tf = Transform(translation=trans, rotation=rot)
+        tf_header = Header(stamp=self.get_clock().now().to_msg(), frame_id=source)
+        tf_stamped = TransformStamped(transform=tf, header=tf_header, child_frame_id=target)
+
+        self.tf_buf.set_transform_static(tf_stamped, 'default_authority')
+
+
+
+    def control(self):
         """Control algorithm to land drone
 
         :param Vector3 e: position error between pixhawk and aruco marker in ned frame
         """
 
-        # currently, only hovering over the aruco marker is implemented
-        u = (e.x, e.y) * self.gains["P"]
+        if self.tf_buf.can_transform('ned','aruco_marker', Time()):
+            # determine control error
+            e_tf = self.tf_buf.lookup_transform('ned','aruco_marker', Time())
+            e = Vector3(x=e_tf.transform.translation.x, y=e_tf.transform.translation.y)
 
-        self.pub_xy_vel(e)
+            # apply controller
+            print(self.gains["P"])
+            u = (e.x * self.gains["P"], e.y * self.gains["P"])
+            print(e)
+            print(u)
+
+            self.pub_xy_vel(u)
         
 
     def aruco_timer_callback(self):
@@ -99,10 +133,26 @@ class VelocityController(Node):
         since the last call
         """
 
+        """
+        targets = ['ned','pixhawk','camera','aruco']
+        for target in targets:
+            if self.tf_buf.can_transform('map',target, Time()):
+                print(target)"""
+
+        
+        if self.tf_buf.can_transform('ned','camera', Time()):
+            self.tf_ned_aruco = self.tf_buf.lookup_transform('ned','camera', Time())
+            print(transform_apply(Vector3(y=1.), self.tf_ned_aruco.transform))
+
+        else:
+            print("At least one frame does not exist")
+            
+
+        """
         if self.aruco_timeout_reset == True:
             self.timeout()
 
-        self.aruco_timeout_reset = True
+        self.aruco_timeout_reset = True"""
 
 
     def timeout(self):
@@ -127,63 +177,26 @@ class VelocityController(Node):
         self.vel_publisher.publish(T)
 
 
-    def process_p_gain_callback(self, msg: Float32):
-        self.gains["P"] = msg
+    def publish_debug_frames(self):
+        frames = ['ned', 'camera', 'pixhawk']
 
-"""
-class TfLine:
-    def __init__(self, node: Node, line: tuple) -> None:
-        self.node = node
-        self.line = line
-        self.transforms = [Transform()] * len(line-1)
-
-        node.create_subscription(TFMessage, "/tf", self.callback, 5)
-        node.create_subscription(TFMessage, "/tf_static", self.callback, 5)
-
-
-    def callback(self, msg: TFMessage):
-        for transform in msg.transforms:
-            self.add_transform(transform)
-
-
-    def add_transform(self, tf: TransformStamped):
-        p_frame = tf.header.frame_id    # parent frame
-        c_frame = tf.child_frame_id     # child frame
-
-        if p_frame in self.line and c_frame in self.line:
-            p_index = self.line.index(p_frame)
-            c_index = self.line.index(c_frame)
-
-            # if c_frame comes after p_frame, refresh transformation
-            if p_frame + 1 == c_frame:
-                self.transforms[p_index] = tf.transform
-
-            # if c_frame comes before p_frame, invert transformation
-            elif p_frame - 1 == c_frame:
-                self.transforms[p_index] = TfLine.invert_transform(tf.transform)
-
-    def get_transform(self):
-        tf = Transform()
-
-        for transform in self.transforms:
-            tf.translation.x = tf.translation.x + transform.translation.x
-
-
-    def invert_transform(tf: Transform):
-        tf.rotation.w = - tf.rotation.w
-        tf.translation.x = - tf.translation.x
-        tf.translation.y = - tf.translation.y
-        tf.translation.z = - tf.translation.z
-
-        return tf
-"""
+        for frame in frames:
+            if self.tf_buf.can_transform('map',frame, Time()):
+                tf = self.tf_buf.lookup_transform('map',frame, Time())
+                tf.header.stamp = self.get_clock().now().to_msg()
+                tf.child_frame_id = frame + '_debug'
+                
+                self.tf_broadcaster.sendTransform(tf)
 
 
 
-        
-
-
-
+def numpy_ndarray_to_Quaternion(ndarr):
+    Q = Quaternion()
+    Q.w = ndarr[0].astype(float)
+    Q.x = ndarr[1].astype(float)
+    Q.y = ndarr[2].astype(float)
+    Q.z = ndarr[3].astype(float)
+    return Q
 
 
 def main(args=None):
