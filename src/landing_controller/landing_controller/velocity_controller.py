@@ -43,7 +43,7 @@ class VelocityController(Node):
 
         # class variables
         self.aruco_timeout_reset = True
-        self.gains = {"P": 0.} # Initial controller gains
+        self.gains = {"P": 1.} # Initial controller gains
 
         # set up transform listener
         self.tf_buf = Buffer()
