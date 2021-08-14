@@ -5,8 +5,6 @@ from rclpy.node import Node
 
 from time import sleep
 
-import math
-
 from std_msgs.msg import Header, Float32
 from geometry_msgs.msg import TransformStamped, Twist, Vector3, Transform, Quaternion
 
@@ -22,28 +20,25 @@ from landing_controller.vector_math import *
 
 class VelocityController(Node):
 
-    # parameters
+    # namings
     TOPICS = {
         "P_GAIN" : "/landing_controller/p_gain"
     }
     TOPICS["CMD_VEL"] = VelocityCommander.TOPICS["CMD_VEL"]
 
-    FRAMES = {
-        "ARUCO"   : "aruco_marker"
-    }
-
-    # time in seconds in which the timeout function is called
-    # timeout is earlist executed after ARUCO_TIMEOUT seconds
-    # and latest after 2*ARUCO_TIMEOUT seconds
-    ARUCO_TIMEOUT = .5   
-
-
     def __init__(self):
         super().__init__('velocity_controller')
 
+        # parameters
+        # static transformation from pixhawk to camera frame
+        TF_PIX_TO_CAMERA = Transform(
+            Vector3(z=.1),      # Translation from Pixhawk to Camera
+            Quaternion()        # Rotation from Pixhawk to Camera
+        )
+        self.gains = {"P": 1.} # Initial controller gains
+
         # class variables
         self.aruco_timeout_reset = True
-        self.gains = {"P": 1.} # Initial controller gains
 
         # set up transform listener
         self.tf_buf = Buffer()
@@ -56,8 +51,7 @@ class VelocityController(Node):
 
         # pixhawk to camera -> dependent on drone construction
         self.init_static_frame('pixhawk', 'camera', 
-                Vector3(z=.1),      # Translation from Pixhawk to Camera
-                Quaternion())       # Rotation from Pixhawk to Camera
+                self.TF_PIX_TO_CAMERA.Translation, self.TF_PIX_TO_CAMERA.Rotation) 
 
         # set up transform broadcaster (for debug)
         self.tf_broadcaster = TransformBroadcaster(self)
@@ -126,33 +120,6 @@ class VelocityController(Node):
             print(u)
 
             self.pub_xy_vel(u)
-        
-
-    def aruco_timer_callback(self):
-        """Checks aruco_timeout_variable and executes timeout if it was not set
-        since the last call
-        """
-
-        """
-        targets = ['ned','pixhawk','camera','aruco']
-        for target in targets:
-            if self.tf_buf.can_transform('map',target, Time()):
-                print(target)"""
-
-        
-        if self.tf_buf.can_transform('ned','camera', Time()):
-            self.tf_ned_aruco = self.tf_buf.lookup_transform('ned','camera', Time())
-            print(transform_apply(Vector3(y=1.), self.tf_ned_aruco.transform))
-
-        else:
-            print("At least one frame does not exist")
-            
-
-        """
-        if self.aruco_timeout_reset == True:
-            self.timeout()
-
-        self.aruco_timeout_reset = True"""
 
 
     def timeout(self):
@@ -178,7 +145,7 @@ class VelocityController(Node):
 
 
     def publish_debug_frames(self):
-        frames = ['ned', 'camera', 'pixhawk']
+        frames = ['ned', 'camera', 'pixhawk', 'aruco_marker']
 
         for frame in frames:
             if self.tf_buf.can_transform('map',frame, Time()):

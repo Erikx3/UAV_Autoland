@@ -22,6 +22,13 @@ def generate_launch_description():
         launch_ros.actions.Node(
             package='landing_controller',
             namespace='',
+            executable='velocity_controller',
+            output='screen',
+            name=['velocity_controller']),
+
+        launch_ros.actions.Node(
+            package='landing_controller',
+            namespace='',
             executable='velocity_commander',
             output='screen',
             name=['velocity_commander']),
