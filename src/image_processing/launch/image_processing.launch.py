@@ -6,6 +6,7 @@ import launch_ros.actions
 
 def generate_launch_description():
     return launch.LaunchDescription([
+        # Image Processing Nodes
         launch_ros.actions.Node(
             package='image_processing',
             namespace='',
@@ -18,6 +19,7 @@ def generate_launch_description():
             executable='v4l2_camera_node',
             output='screen',
             name=['camera_node'])
+            
         # launch.actions.ExecuteProcess(
         # 	cmd=['ros2', 'bag', 'record', '/image_raw', '/image_vectors'],
         # 	output='screen'

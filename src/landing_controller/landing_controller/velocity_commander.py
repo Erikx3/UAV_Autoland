@@ -9,7 +9,7 @@ from px4_msgs.msg import Timesync, OffboardControlMode, TrajectorySetpoint, Vehi
 
 class VelocityCommander(Node):
 
-    # parameters
+    # constants
     TOPICS = {
         "CMD_VEL":    'cmd_vel',
         "PX4_TIME":   'Timesync_PubSubTopic',
@@ -23,8 +23,6 @@ class VelocityCommander(Node):
         super().__init__('velocity_commander')
 
         # class variables
-        self.keep_alive = True
-        self.key = -1
         self.t_sync = 0
         self.vel = Vector3()
         self.pub_counter = 0
@@ -50,12 +48,15 @@ class VelocityCommander(Node):
         self.pub_vel_timer = self.create_timer(.1, self.timer_callback)
 
     def timer_callback(self):
+<<<<<<< HEAD
         # change to offboard mode after 10 loops
         if self.pub_counter == 10:
             # set offboard mode
             self.pub_vehicle_command(VehicleCommand.VEHICLE_CMD_DO_SET_MODE, 1., 6.)
             #self.arm()
 
+=======
+>>>>>>> velocity_controller
         self.pub_offb_control_mode()
         self.pub_trajectory_setpoint()
 
