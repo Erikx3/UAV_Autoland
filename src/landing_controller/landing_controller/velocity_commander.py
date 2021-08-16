@@ -25,7 +25,6 @@ class VelocityCommander(Node):
         # class variables
         self.t_sync = 0
         self.vel = Vector3()
-        self.pub_counter = 0
 
         # subscription callbacks
         self.sub_timesync = self.create_subscription(
@@ -48,21 +47,8 @@ class VelocityCommander(Node):
         self.pub_vel_timer = self.create_timer(.1, self.timer_callback)
 
     def timer_callback(self):
-<<<<<<< HEAD
-        # change to offboard mode after 10 loops
-        if self.pub_counter == 10:
-            # set offboard mode
-            self.pub_vehicle_command(VehicleCommand.VEHICLE_CMD_DO_SET_MODE, 1., 6.)
-            #self.arm()
-
-=======
->>>>>>> velocity_controller
         self.pub_offb_control_mode()
         self.pub_trajectory_setpoint()
-
-        # stop counter
-        if self.pub_counter < 11:
-            self.pub_counter = self.pub_counter + 1
         
 
     def pub_offb_control_mode(self):
