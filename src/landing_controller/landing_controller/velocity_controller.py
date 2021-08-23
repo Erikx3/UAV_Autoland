@@ -31,9 +31,9 @@ class VelocityController(Node):
         # static transformation from pixhawk to camera frame
         self.TF_PIX_TO_CAMERA = Transform(
             translation = Vector3(z=.1),      # Translation from Pixhawk to Camera
-            rotation = Quaternion()        # Rotation from Pixhawk to Camera
+            rotation = quat_multiply(Quaternion(x=1.,z=0.), Quaternion(w=.7,z=.7))         # Rotation from Pixhawk to Camera
         )
-        self.gains = {"P": 1., "I": .1} # Initial controller gains
+        self.gains = {"P": 0.1, "I": 0.} # Initial controller gains
         self.dt = .01 # Frequency of controller execution
 
         # class variables

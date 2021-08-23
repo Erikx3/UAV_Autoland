@@ -25,6 +25,7 @@ class VelocityCommander(Node):
         # class variables
         self.t_sync = 0
         self.vel = Vector3()
+        self.pub_counter = 0
 
         # subscription callbacks
         self.sub_timesync = self.create_subscription(
@@ -49,6 +50,10 @@ class VelocityCommander(Node):
     def timer_callback(self):
         self.pub_offb_control_mode()
         self.pub_trajectory_setpoint()
+
+        # stop counter
+        if self.pub_counter < 11:
+            self.pub_counter = self.pub_counter + 1
         
 
     def pub_offb_control_mode(self):
@@ -76,7 +81,7 @@ class VelocityCommander(Node):
 
         sp.x = math.nan
         sp.y = math.nan
-        sp.z = -1.5
+        sp.z = -3.
 
         sp.yaw = math.nan # should not yaw right at startup
 
