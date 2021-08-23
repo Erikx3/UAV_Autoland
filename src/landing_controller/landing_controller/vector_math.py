@@ -11,6 +11,13 @@ def vec_add(v1: Vector3, v2: Vector3):
 
     return v
 
+def vec_mult(v: Vector3, k):
+    return Vector3(
+        x = v.x*k,
+        y = v.y*k,
+        z = v.z*k
+    )
+
 def quat_multiply(q1: Quaternion, q2: Quaternion):
     q = Quaternion()
     q.w = q1.w*q2.w - q1.x*q2.x - q1.y*q2.y - q1.z*q2.z 

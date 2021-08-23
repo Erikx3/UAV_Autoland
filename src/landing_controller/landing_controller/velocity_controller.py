@@ -1,9 +1,6 @@
 import rclpy
-from rclpy.duration import Duration
 from rclpy.time import Time
 from rclpy.node import Node
-
-from time import sleep
 
 from std_msgs.msg import Header, Float32
 from geometry_msgs.msg import TransformStamped, Twist, Vector3, Transform, Quaternion
@@ -22,7 +19,8 @@ class VelocityController(Node):
 
     # namings
     TOPICS = {
-        "P_GAIN" : "/landing_controller/p_gain"
+        "P_GAIN" : "/landing_controller/p_gain",
+        "I_GAIN" : "/landing_controller/i_gain"
     }
     TOPICS["CMD_VEL"] = VelocityCommander.TOPICS["CMD_VEL"]
 
@@ -31,14 +29,16 @@ class VelocityController(Node):
 
         # parameters
         # static transformation from pixhawk to camera frame
-        TF_PIX_TO_CAMERA = Transform(
-            Vector3(z=.1),      # Translation from Pixhawk to Camera
-            Quaternion()        # Rotation from Pixhawk to Camera
+        self.TF_PIX_TO_CAMERA = Transform(
+            translation = Vector3(z=.1),      # Translation from Pixhawk to Camera
+            rotation = Quaternion()        # Rotation from Pixhawk to Camera
         )
-        self.gains = {"P": 1.} # Initial controller gains
+        self.gains = {"P": 1., "I": .1} # Initial controller gains
+        self.dt = .01 # Frequency of controller execution
 
         # class variables
         self.aruco_timeout_reset = True
+        self.integrator = Vector3()
 
         # set up transform listener
         self.tf_buf = Buffer()
@@ -51,7 +51,7 @@ class VelocityController(Node):
 
         # pixhawk to camera -> dependent on drone construction
         self.init_static_frame('pixhawk', 'camera', 
-                self.TF_PIX_TO_CAMERA.Translation, self.TF_PIX_TO_CAMERA.Rotation) 
+                self.TF_PIX_TO_CAMERA.translation, self.TF_PIX_TO_CAMERA.rotation) 
 
         # set up transform broadcaster (for debug)
         self.tf_broadcaster = TransformBroadcaster(self)
@@ -62,17 +62,20 @@ class VelocityController(Node):
             'VehicleAttitude_PubSubTopic',
             self.attitude_callback,
             10)
-        self.sub_ctrl_gain = self.create_subscription(
+        self.sub_ctrl_gain_p = self.create_subscription(
             Float32,
             self.TOPICS["P_GAIN"],
-            self.process_p_gain_callback,
-            1)
+            self.process_p_gain_callback, 1)
+        self.sub_ctrl_gain_i = self.create_subscription(
+            Float32,
+            self.TOPICS["I_GAIN"],
+            self.process_i_gain_callback, 1)
 
         # init publications
         self.vel_publisher = self.create_publisher(Twist, self.TOPICS["CMD_VEL"], 1)
             
         # timer callbacks
-        self.control_timer = self.create_timer(.1, self.control)
+        self.control_timer = self.create_timer(self.dt, self.control)
 
 
 
@@ -92,6 +95,9 @@ class VelocityController(Node):
     def process_p_gain_callback(self, msg: Float32):
         self.gains["P"] = msg.data
 
+    def process_i_gain_callback(self, msg: Float32):
+        self.gains["I"] = msg.data
+
 
     def init_static_frame(self, source: str, target: str, trans: Vector3, rot: Quaternion):
         tf = Transform(translation=trans, rotation=rot)
@@ -103,19 +109,23 @@ class VelocityController(Node):
 
 
     def control(self):
-        """Control algorithm to land drone
-
-        :param Vector3 e: position error between pixhawk and aruco marker in ned frame
+        """Control algorithm to hover over target
         """
 
         if self.tf_buf.can_transform('ned','aruco_marker', Time()):
             # determine control error
             e_tf = self.tf_buf.lookup_transform('ned','aruco_marker', Time())
             e = Vector3(x=e_tf.transform.translation.x, y=e_tf.transform.translation.y)
+            self.integrator = vec_add(
+                Vector3(x=self.integrator.x, y=self.integrator.y) ,
+                vec_mult(e, self.dt))
 
             # apply controller
-            print(self.gains["P"])
-            u = (e.x * self.gains["P"], e.y * self.gains["P"])
+            u3 = vec_add(
+                vec_mult(e,                 self.gains["P"]), 
+                vec_mult(self.integrator,   self.gains["I"])
+            )
+            u = (u3.x, u3.y)
             print(e)
             print(u)
 
