@@ -1,4 +1,4 @@
-# Special Topics in Flight Guidance, Navigation and Air Transport Course Fall 2021, TU Berlin
+# Special Topics in Flight Guidance, Navigation and Air Transport Course Summer 2021, TU Berlin
 
 → **Wiki:** [Our Awesome Wiki](https://github.com/Erikx3/UAV_Autoland/wiki)
 
