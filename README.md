@@ -1,6 +1,6 @@
-# Special Topics 2021
+# Special Topics in Flight Guidance, Navigation and Air Transport Course Fall 2021, TU Berlin
 
-→ **Wiki:** [Our Awesome Wiki](https://git.tu-berlin.de/eriksuer/specialtopics/-/wikis/home)
+→ **Wiki:** [Our Awesome Wiki](https://github.com/Erikx3/UAV_Autoland/wiki)
 
 Project: Automatic Landing on Ground Vehicle Unit
 
